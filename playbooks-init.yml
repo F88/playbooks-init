@@ -1,0 +1,49 @@
+---
+- name: Set up directory layout according to defined pattern of playbooks
+
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  sudo: no
+
+  vars:
+    cwd: "{{ lookup('env','PWD') }}"
+ 
+  vars_prompt:
+
+    - name: dir
+      prompt: Which directory to set up
+      default: best-practice-of-ansible
+      private: no
+      when: dir is not defined
+
+    # cannot to use variables in `vars_prompt` :(
+    - name: pattern_name
+      prompt: Which pattern ?
+      default: best-practice-of-ansible
+      private: no
+      when: pattern_name is not defined
+
+  pre_tasks:
+
+    # support to '--extra-vars' 
+    - set_fact: dest_dir={{ dir }}
+
+    - name: expand a path containing a tilde (~)
+      set_fact:
+        dest_dir: "{{ dest_dir | expanduser }}"
+      when: dest_dir | match("~.*")
+
+    - name: prepend cwd to relative path
+      set_fact:
+        dest_dir: "{{ cwd }}/{{ dest_dir }}"
+      when: not dest_dir | match("/.*")
+
+  roles:
+    - role: "{{ pattern_name }}"
+
+
+  post_tasks:
+    - name: display processing result
+      debug: msg="'{{inventory_hostname}}:{{ dest_dir }}' set up based on pattern '{{ pattern_name }}'."
+

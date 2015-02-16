@@ -1,0 +1,18 @@
+---
+# Best Practices - Ansible Documentation
+# http://docs.ansible.com/playbooks_best_practices.html#directory-layout
+
+- debug: var=dir
+- debug: var=dest_dir
+#- debug: msg="setup directory '{{ dest_dir }}' on '{{ inventory_hostname }}'"
+#  when: dest_dir is defined
+
+#- fail:
+#
+#- file: path={{ dest_dir }} state=directory
+#
+#- name: setup layout designed for {{ role_names }}
+#  copy: src=./ dest={{ dest_dir }}
+#  notify:
+#    - show notes
+#

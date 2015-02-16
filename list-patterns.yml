@@ -1,0 +1,24 @@
+---
+- name: Find defined patterns
+  hosts: localhost
+  gather_facts: no
+  vars:
+    pattern_list: "{{ playbook_dir }}/patterns.yml"
+
+  tasks:
+
+    - name: fine delined roles as layout pattern
+      shell: find "{{ playbook_dir }}/roles/" -mindepth 1 -maxdepth 1 -type d | sort
+      register: defined_patterns
+
+    - debug: var=defined_patterns.stdout_lines
+
+    - name: initialize pattern file
+      shell: echo 'layout_pattern:' > "{{ pattern_list }}"
+      when: to_files is defined
+
+    - name: append defined_patterns to pattern fiie
+      shell: echo "  - {{ item | basename }}" >> "{{ pattern_list }}"
+      with_items: defined_patterns.stdout_lines
+      when: to_files is defined
+
